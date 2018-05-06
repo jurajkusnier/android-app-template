@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:layout_height="wrap_content"
+                                             android:padding="5dp"
+>
+
+    <TextView
+            android:text="Fri May 04 22:23:38 UTC 2018"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textTime"
+            android:textStyle="italic"
+            style="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+            android:text="Software Engineer, Service Backend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintTop_toBottomOf="@id/textTime"
+            android:id="@+id/textTitle"/>
+
+
+    <TextView
+            android:text="San Francisco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textLocation"
+            style="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintTop_toBottomOf="@id/textTitle" />
+
+    <TextView
+            android:text="SmartNews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:id="@+id/textCompany"
+            app:layout_constraintTop_toBottomOf="@id/textLocation" />
+
+    <Button
+            android:id="@+id/buttonMoreInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/textLocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/colorAccent"
+            android:text="More Info"/>
+
+
+
+</android.support.constraint.ConstraintLayout>
