@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">App Template</string>
     <string name="no_search_results">No search results found</string>
+    <string name="network_connection_error">Network Connection Error</string>
 </resources>

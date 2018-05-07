@@ -3,6 +3,8 @@ package com.jurajkusnier.androidapptemplate.ui.jobs
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
@@ -13,7 +15,6 @@ import com.jurajkusnier.androidapptemplate.di.ViewModelFactory
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_users.*
 import javax.inject.Inject
-
 
 /*
 UserActivity shows list of jobs from https://jobs.github.com/api
@@ -27,6 +28,7 @@ class JobsActivity: DaggerAppCompatActivity() {
     lateinit var viewModel: JobsViewModel
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
+    var errorSnackbar:Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +64,14 @@ class JobsActivity: DaggerAppCompatActivity() {
                 } else {
                     progressBar.visibility = View.GONE
                     progressBackdrop.visibility = View.GONE
+            }
+
+            if (it == JobsViewModel.SearchState.ERROR) {
+                errorSnackbar = Snackbar.make(recyclerViewJobs, getString(R.string.network_connection_error),Snackbar.LENGTH_INDEFINITE)
+                errorSnackbar?.view?.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorAccent,null))
+                errorSnackbar?.show()
+            } else {
+                errorSnackbar?.dismiss()
             }
         })
 
