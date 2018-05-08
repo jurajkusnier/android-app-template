@@ -30,6 +30,11 @@ class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): V
         searchState.value = SearchState.DONE
     }
 
+    override fun onCleared() {
+        disposable?.dispose()
+        super.onCleared()
+    }
+
     fun searchPositions(search:String?) {
         lastQuery = search
 
