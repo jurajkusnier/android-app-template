@@ -1,5 +1,6 @@
 package com.jurajkusnier.androidapptemplate.ui.jobs
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.util.Log
@@ -17,17 +18,22 @@ class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): V
 
     private val TAG = JobsViewModel::class.simpleName
 
-    var lastQuery:String? = null
-        private set
-    var searchState: MutableLiveData<SearchState> = MutableLiveData()
-        private set
-    var jobsResults: MutableLiveData<List<Job>> = MutableLiveData()
-        private set
-
     private var disposable: Disposable? = null
 
+    var lastQuery:String? = null
+        private set
+
+    private val _searchState: MutableLiveData<SearchState> = MutableLiveData()
+    val searchState: LiveData<SearchState>
+        get() = _searchState
+
+    private val _jobsResults: MutableLiveData<List<Job>> = MutableLiveData()
+    val jobsResults: LiveData<List<Job>>
+        get() = _jobsResults
+
+
     init {
-        searchState.value = SearchState.DONE
+        _searchState.value = SearchState.DONE
     }
 
     override fun onCleared() {
@@ -39,13 +45,13 @@ class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): V
         lastQuery = search
 
         if (search == null) {
-            jobsResults.value = listOf()
+            _jobsResults.value = listOf()
             return
         }
 
         disposable?.dispose()
 
-        searchState.value = SearchState.IN_SEARCH
+        _searchState.value = SearchState.IN_SEARCH
 
         disposable = repository.searchPosition(search)
                 .subscribeOn(Schedulers.io())
@@ -53,13 +59,13 @@ class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): V
                 .subscribe(
                         {
                             data ->
-                                jobsResults.value = data
-                                searchState.value = SearchState.DONE
+                                _jobsResults.value = data
+                                _searchState.value = SearchState.DONE
                         },
                         {
                             error ->
                                 Log.e(TAG,Log.getStackTraceString(error))
-                                searchState.value = SearchState.ERROR
+                                _searchState.value = SearchState.ERROR
                              }
                 )
     }
