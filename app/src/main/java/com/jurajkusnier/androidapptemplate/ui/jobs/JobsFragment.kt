@@ -2,40 +2,60 @@ package com.jurajkusnier.androidapptemplate.ui.jobs
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.res.ResourcesCompat
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.jurajkusnier.androidapptemplate.R
 import com.jurajkusnier.androidapptemplate.data.model.Job
 import com.jurajkusnier.androidapptemplate.di.ViewModelFactory
-import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.android.synthetic.main.activity_users.*
+import dagger.android.AndroidInjection
+import dagger.android.support.DaggerFragment
+import kotlinx.android.synthetic.main.jobs_fragment.*
 import javax.inject.Inject
 
 /*
-UserActivity shows list of jobs from https://jobs.github.com/api
+JobsFragment shows list of jobs from https://jobs.github.com/api
 It uses retrofit library to load data from REST API.
 All dependencies are injected by Dagger 2
  */
-class JobsActivity: DaggerAppCompatActivity() {
+class JobsFragment: DaggerFragment() {
 
-    val TAG = JobsActivity::class.simpleName
+    val TAG = JobsFragment::class.simpleName
 
     lateinit var viewModel: JobsViewModel
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
     var errorSnackbar:Snackbar? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_users)
-        setSupportActionBar(toolbar)
+    companion object {
+        fun newInstance() = JobsFragment()
+    }
 
-        val layoutManager = LinearLayoutManager(this)
+    override fun onAttach(context: Context?) {
+        //DI activity injection first
+        AndroidInjection.inject(activity)
+        super.onAttach(context)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.jobs_fragment, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+        val layoutManager = LinearLayoutManager(context)
         recyclerViewJobs.layoutManager = layoutManager
 
         val dividerItemDecoration = DividerItemDecoration(recyclerViewJobs.context, layoutManager.orientation)
