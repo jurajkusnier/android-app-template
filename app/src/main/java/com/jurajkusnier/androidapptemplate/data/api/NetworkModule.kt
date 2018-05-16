@@ -1,11 +1,13 @@
 package com.jurajkusnier.androidapptemplate.data.api
 
+import android.util.Log
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jurajkusnier.androidapptemplate.BuildConfig
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -36,6 +38,19 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    fun provideDelayInterceptor(): Interceptor {
+        return Interceptor { chain ->
+            try {
+                Thread.sleep(BuildConfig.NETWORK_DELAY)
+            } catch (e: Exception) {
+                Log.e(TAG, Log.getStackTraceString(e))
+            }
+            chain.proceed(chain.request())
+        }
+    }
+
+    @Provides
+    @Singleton
     @Named("baseUrl")
     fun provideBaseUrl(): String{
         return "https://jobs.github.com/"
@@ -58,11 +73,13 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(loginInterceptor: HttpLoggingInterceptor):OkHttpClient {
+    fun provideHttpClient(loggingInterceptor: HttpLoggingInterceptor, delayInterceptor: Interceptor):OkHttpClient {
 
-        return OkHttpClient.Builder()
-                .addInterceptor(loginInterceptor)
-                .build()
+        val okHttpClient = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
+        if (BuildConfig.DEBUG) {
+            okHttpClient.addInterceptor(delayInterceptor)
+        }
+        return okHttpClient.build()
     }
 
     @Provides

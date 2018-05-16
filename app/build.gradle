@@ -20,6 +20,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("long","NETWORK_DELAY","0")
+        }
+
+        debug {
+            buildConfigField("long","NETWORK_DELAY","0")
+        }
+
+        debugSlowNetwork {
+            initWith debug
+            buildConfigField("long","NETWORK_DELAY","3000") //delay 3 seconds
         }
     }
 }
@@ -43,6 +53,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_library_version"
     implementation "com.android.support:design:$support_library_version"
     implementation "com.android.support.constraint:constraint-layout:$constraintLayout"
+    implementation "com.android.support:recyclerview-v7:$support_library_version"
+    implementation "com.android.support:cardview-v7:$support_library_version"
 
     // Dagger 2
     implementation "com.google.dagger:dagger:$dagger_version"
@@ -76,7 +88,5 @@ dependencies {
 
     // Other
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:cardview-v7:27.1.1'
 
 }
