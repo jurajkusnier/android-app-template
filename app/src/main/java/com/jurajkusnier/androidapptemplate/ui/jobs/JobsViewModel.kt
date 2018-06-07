@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.util.Log
+import com.jurajkusnier.androidapptemplate.data.api.OfflineException
 import com.jurajkusnier.androidapptemplate.data.model.Job
 import com.jurajkusnier.androidapptemplate.data.repository.GitHubJobsRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): ViewModel() {
 
-    enum class SearchState {DONE, IN_SEARCH, ERROR}
+    enum class SearchState {DONE, IN_SEARCH, ERROR, ERROR_OFFLINE}
 
     private val TAG = JobsViewModel::class.simpleName
 
@@ -64,9 +65,13 @@ class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): V
                         },
                         {
                             error ->
+                                if (error is OfflineException) {
+                                    _searchState.value = SearchState.ERROR_OFFLINE
+                                } else {
+                                    _searchState.value = SearchState.ERROR
+                                }
                                 Log.e(TAG,Log.getStackTraceString(error))
-                                _searchState.value = SearchState.ERROR
-                             }
+                        }
                 )
     }
 

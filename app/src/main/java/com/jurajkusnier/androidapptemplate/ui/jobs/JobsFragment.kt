@@ -86,8 +86,14 @@ class JobsFragment: DaggerFragment() {
                     progressBackdrop.visibility = View.GONE
             }
 
-            if (it == JobsViewModel.SearchState.ERROR) {
-                errorSnackbar = Snackbar.make(recyclerViewJobs, getString(R.string.network_connection_error),Snackbar.LENGTH_INDEFINITE)
+            val errorMessage = when (it) {
+                JobsViewModel.SearchState.ERROR -> getString(R.string.network_connection_error)
+                JobsViewModel.SearchState.ERROR_OFFLINE ->  getString(R.string.offline_error)
+                else -> null
+            }
+
+            if (errorMessage != null) {
+                errorSnackbar = Snackbar.make(recyclerViewJobs, errorMessage, Snackbar.LENGTH_INDEFINITE)
                 errorSnackbar?.view?.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorAccent,null))
                 errorSnackbar?.show()
             } else {
