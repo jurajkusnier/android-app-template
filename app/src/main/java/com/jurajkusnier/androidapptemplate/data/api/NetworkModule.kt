@@ -66,7 +66,13 @@ class NetworkModule {
             } catch (e: Exception) {
                 Log.e(TAG, Log.getStackTraceString(e))
             }
-            chain.proceed(chain.request())
+
+            try {
+                chain.proceed(chain.request())
+            } catch (e:Exception) {
+                Log.e(TAG, Log.getStackTraceString(e))
+                throw e
+            }
         }
     }
 
