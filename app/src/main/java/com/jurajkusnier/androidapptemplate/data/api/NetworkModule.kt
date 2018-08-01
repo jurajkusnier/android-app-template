@@ -76,12 +76,7 @@ class NetworkModule {
         }
     }
 
-    @Provides
-    @Singleton
-    @Named("baseUrl")
-    fun provideBaseUrl(): String{
-        return "https://jobs.github.com/"
-    }
+
 
     @Provides
     @Singleton
@@ -100,13 +95,14 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(loggingInterceptor: HttpLoggingInterceptor, @Named("delayInterceptor")delayInterceptor: Interceptor, @Named("offlineInterceptor")offlineCheckInterceptor: Interceptor):OkHttpClient {
+    fun provideHttpClient(loggingInterceptor: HttpLoggingInterceptor? = null, @Named("delayInterceptor")delayInterceptor: Interceptor? = null, @Named("offlineInterceptor")offlineCheckInterceptor: Interceptor? = null):OkHttpClient {
 
         val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .addInterceptor(offlineCheckInterceptor)
 
-        if (BuildConfig.DEBUG) {
+        if (loggingInterceptor != null) okHttpClient.addInterceptor(loggingInterceptor)
+        if (offlineCheckInterceptor != null)  okHttpClient.addInterceptor(offlineCheckInterceptor)
+
+        if (BuildConfig.DEBUG && delayInterceptor != null) {
             okHttpClient.addInterceptor(delayInterceptor)
         }
 

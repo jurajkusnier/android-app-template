@@ -39,12 +39,6 @@ class JobsFragment: DaggerFragment() {
         fun newInstance() = JobsFragment()
     }
 
-    override fun onAttach(context: Context?) {
-        //DI activity injection first
-        AndroidInjection.inject(activity)
-        super.onAttach(context)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.jobs_fragment, container, false)

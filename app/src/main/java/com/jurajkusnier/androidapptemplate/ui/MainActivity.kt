@@ -11,9 +11,6 @@ class MainActivity: DaggerAppCompatActivity() {
     val TAG = MainActivity::class.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //DI activity injection first
-        AndroidInjection.inject(this)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
