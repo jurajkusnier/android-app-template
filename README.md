@@ -20,6 +20,7 @@ Individual modules are easy to test because dependencies are solved by dependenc
  * **RxAndroid** - https://github.com/ReactiveX/RxAndroid
  * **RxJava** - https://github.com/ReactiveX/RxJava
  * **Moshi** - https://github.com/square/moshi
+ * **LeakCanary** - https://github.com/square/leakcanary
  
 ## Feedback
 If you use this template for your project please let me known how satisfied you are.
