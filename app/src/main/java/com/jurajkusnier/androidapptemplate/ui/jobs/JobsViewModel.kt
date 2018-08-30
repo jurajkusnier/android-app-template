@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 
-class JobsViewModel @Inject constructor(val repository: GitHubJobsRepository): ViewModel() {
+class JobsViewModel @Inject constructor(private val repository: GitHubJobsRepository): ViewModel() {
 
     enum class SearchState {DONE, IN_SEARCH, ERROR, ERROR_OFFLINE}
 

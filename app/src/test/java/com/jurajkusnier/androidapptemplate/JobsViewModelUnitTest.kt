@@ -1,17 +1,17 @@
 package com.jurajkusnier.androidapptemplate
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import com.jurajkusnier.androidapptemplate.data.api.GitHubJobsApiService
 import com.jurajkusnier.androidapptemplate.data.model.Job
 import com.jurajkusnier.androidapptemplate.data.repository.GitHubJobsRepository
 import com.jurajkusnier.androidapptemplate.ui.jobs.JobsViewModel
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.internal.schedulers.ExecutorScheduler
+import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.BeforeClass
@@ -20,8 +20,8 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import java.util.concurrent.Executor
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -33,57 +33,62 @@ class JobsViewModelUnitTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    lateinit var gitHubJobsApiService: GitHubJobsApiService
-    lateinit var gitHubJobsRepository: GitHubJobsRepository
-    lateinit var jobsViewModel: JobsViewModel
-
-    val observerLambda : (List<Job>?) -> Unit = {}
+    private lateinit var gitHubJobsApiService: GitHubJobsApiService
+    private lateinit var gitHubJobsRepository: GitHubJobsRepository
+    private lateinit var jobsViewModel: JobsViewModel
 
     @Before
     fun doBefore() {
         gitHubJobsApiService = Mockito.mock(GitHubJobsApiService::class.java)
-        gitHubJobsRepository = GitHubJobsRepository(gitHubJobsApiService)
+        gitHubJobsRepository = Mockito.mock(GitHubJobsRepository::class.java)
         jobsViewModel = JobsViewModel(gitHubJobsRepository)
     }
 
     companion object {
+        private val immediate: Scheduler = object : Scheduler() {
+            override fun createWorker(): Scheduler.Worker {
+                return ExecutorScheduler.ExecutorWorker(Executor { it.run() })
+            }
+        }
 
         @BeforeClass @JvmStatic
-        fun setupSchdulers() {
-            RxAndroidPlugins.setInitMainThreadSchedulerHandler { _ -> Schedulers.io()}
+        fun setupSchedulers() {
+            RxJavaPlugins.setInitIoSchedulerHandler{ _ -> immediate }
+            RxAndroidPlugins.setInitMainThreadSchedulerHandler{ _ -> immediate}
         }
     }
 
-
     @Test
-    fun emptyJobsListTest() {
-        val result = emptyList<Job>()
-        doTest(result)
-    }
+    fun nullSearchQuery() {
+        val observer = mock<Observer<List<Job>>>()
+        jobsViewModel.jobsResults.observeForever(observer)
 
-    private fun doTest(result:List<Job>) {
-        Mockito.`when`(gitHubJobsApiService.searchPositions(anyString())).thenReturn(Observable.just(result))
+        Mockito.verifyNoMoreInteractions(observer)
+        Mockito.verifyNoMoreInteractions(gitHubJobsRepository)
 
-        val observerMock = mock(observerLambda::class.java)
-        val lifecycle = LifecycleRegistry(mock(LifecycleOwner::class.java))
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-
-        jobsViewModel.searchPositions("")
-
-        jobsViewModel.jobsResults.observe({lifecycle}, observerMock )
-
-        verify(observerMock ).invoke(result)
+        jobsViewModel.searchPositions(null)
+        verify(observer).onChanged(listOf())
     }
 
     @Test
-    fun notEmptyJobsListTest() {
+    fun jobsResults() {
         val result = listOf(
                 Job("ID_1","0","TITLE_1","LOCATION_1","TYPE","DESCRIPTION","","company",null,null,""),
                 Job("ID_2","0","TITLE_2","LOCATION_2","TYPE","DESCRIPTION","","company",null,null,""),
                 Job("ID_3","0","TITLE_3","LOCATION_3","TYPE","DESCRIPTION","","company",null,null,""),
                 Job("ID_4","0","TITLE_4","LOCATION_4","TYPE","DESCRIPTION","","company",null,null,"")
         )
-        doTest(result)
+
+        val observer = mock<Observer<List<Job>>>()
+        jobsViewModel.jobsResults.observeForever(observer)
+        Mockito.`when`(gitHubJobsRepository.searchPosition(anyString()))
+                .thenReturn(Observable.just(result))
+
+        Mockito.verifyNoMoreInteractions(observer)
+        Mockito.verifyNoMoreInteractions(gitHubJobsRepository)
+
+        jobsViewModel.searchPositions("Test")
+        verify(observer).onChanged(result)
     }
 
     @Test
