@@ -19,7 +19,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("long","NETWORK_DELAY","0")
         }
@@ -37,10 +38,10 @@ android {
 
 ext {
     support_library_version = "27.1.1"
-    dagger_version = "2.15"
+    dagger_version = "2.16"
     retrofit_version = "2.0.2"
     moshi_version = "1.5.0"
-    constraintLayout = "1.1.0"
+    constraintLayout = "1.1.2"
     rxjava = "2.1.10"
     rxandroid = "2.0.2"
     arch_version = "1.1.1"
@@ -70,9 +71,9 @@ dependencies {
 
 
     // OkHttp
-    compile "com.squareup.okhttp3:okhttp:$okhttp"
-    testCompile "com.squareup.okhttp3:mockwebserver:$okhttp"
-    androidTestCompile "com.squareup.okhttp3:mockwebserver:$okhttp"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp"
 
     // RxJava
     implementation "io.reactivex.rxjava2:rxjava:$rxjava"
@@ -83,8 +84,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshi_version"
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
-    implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0"
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation "com.squareup.okhttp3:logging-interceptor:3.10.0"
 
     // Android Architecture Components
@@ -96,8 +96,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    testCompile 'org.mockito:mockito-core:2.15.0'
-    androidTestCompile 'org.mockito:mockito-android:2.8.47'
+    testCompile 'org.mockito:mockito-core:2.19.0'
+    androidTestCompile 'org.mockito:mockito-android:2.12.0'
     testImplementation "android.arch.core:core-testing:$arch_version"
 
     //LeakCanary

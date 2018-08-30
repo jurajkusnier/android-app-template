@@ -2,7 +2,6 @@ package com.jurajkusnier.androidapptemplate.data.api
 
 import android.content.Context
 import android.util.Log
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jurajkusnier.androidapptemplate.BuildConfig
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
@@ -12,6 +11,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
@@ -19,7 +19,14 @@ import javax.inject.Singleton
 
 @Module
 class NetworkModule {
-    private val TAG = NetworkModule::class.simpleName
+
+    companion object {
+        private val TAG = NetworkModule::class.simpleName
+
+        private const val OFFLINE_INTERCEPTOR = "offlineInterceptor"
+        private const val DELAY_INTERCEPTOR = "delayInterceptor"
+        private const val BASE_URL = "baseUrl"
+    }
 
     @Provides
     @Singleton
@@ -29,7 +36,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Named("offlineInterceptor")
+    @Named(OFFLINE_INTERCEPTOR)
     fun provideOfflineCheckInterceptor(networkInfo: NetworkInfo):Interceptor{
         return Interceptor { chain ->
             if (networkInfo.isNetworkAvailable()) {
@@ -58,7 +65,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Named("delayInterceptor")
+    @Named(DELAY_INTERCEPTOR)
     fun provideDelayInterceptor(): Interceptor {
         return Interceptor { chain ->
             try {
@@ -84,7 +91,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(@Named("baseUrl") baseUrl: String, moshi: Moshi, httpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(@Named(BASE_URL) baseUrl: String, moshi: Moshi, httpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -95,7 +102,9 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(loggingInterceptor: HttpLoggingInterceptor? = null, @Named("delayInterceptor")delayInterceptor: Interceptor? = null, @Named("offlineInterceptor")offlineCheckInterceptor: Interceptor? = null):OkHttpClient {
+    fun provideHttpClient(loggingInterceptor: HttpLoggingInterceptor? = null,
+                          @Named(DELAY_INTERCEPTOR)delayInterceptor: Interceptor? = null,
+                          @Named(OFFLINE_INTERCEPTOR)offlineCheckInterceptor: Interceptor? = null):OkHttpClient {
 
         val okHttpClient = OkHttpClient.Builder()
 
